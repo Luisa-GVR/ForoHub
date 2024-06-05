@@ -50,15 +50,6 @@ public class LoginController {
     public String autenticarUsuario(@RequestParam String correoElectronico,
                                     @RequestParam String contrasena,
                                     RedirectAttributes redirectAttributes) {
-        // Log inicial para verificar si el método está siendo llamado
-        logger.info("Llamada a autenticarUsuario");
-
-        // Imprimir los datos recibidos en la consola
-        logger.info("Correo: " + correoElectronico);
-        logger.info("Contraseña sin hash: " + contrasena);
-
-        String bCrypt = bCryptPassword(contrasena);
-
 
         Authentication authToken = new UsernamePasswordAuthenticationToken(correoElectronico, contrasena);
 
@@ -76,10 +67,4 @@ public class LoginController {
         }
     }
 
-
-    private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10, new SecureRandom());
-
-    private String bCryptPassword(String password) {
-        return passwordEncoder.encode(password);
-    }
 }
