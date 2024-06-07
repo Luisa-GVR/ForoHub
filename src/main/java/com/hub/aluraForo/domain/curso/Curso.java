@@ -1,5 +1,6 @@
 package com.hub.aluraForo.domain.curso;
 
+import com.hub.aluraForo.domain.categoria.Categoria;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -18,9 +19,22 @@ public class Curso {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String nombre;
-    private String categoria;
+    @Enumerated(EnumType.STRING)
+    private Categoria categoria;
 
+    public String getNombre() {
+        return nombre;
+    }
 
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
+    public Categoria getCategoria() {
+        return categoria;
+    }
 
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
 }

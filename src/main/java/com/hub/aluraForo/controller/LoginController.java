@@ -56,9 +56,13 @@ public class LoginController {
         try {
             var usuarioAutenticado = authenticationManager.authenticate(authToken);
             var JWTtoken = tokenService.generarToken((Usuario) usuarioAutenticado.getPrincipal());
-            redirectAttributes.addAttribute("token", JWTtoken);
 
-            return "redirect:/hello";
+            //No olvidar pasar este siempre
+            redirectAttributes.addAttribute("token", JWTtoken);
+            redirectAttributes.addAttribute("correoElectronico", correoElectronico);
+
+
+            return "redirect:/topicos";
         } catch (AuthenticationException e) {
             logger.error("Error de autenticación: " + e.getMessage());
 

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles del topico</title>
+    <script>
+        function deleteTopic(id, token, correoElectronico) {
+            fetch(`/topicos/${id}?token=${token}&correoElectronico=${correoElectronico}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                }
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = `/topicos?token=${token}&correoElectronico=${correoElectronico}`;
+                } else {
+                    alert('Failed to delete the topic.');
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<h1>Detalles del topico</h1>
+
+<div>
+    <p><strong>Titulo:</strong> <span th:text="${topico.titulo}"></span></p>
+    <p><strong>Mensaje:</strong> <span th:text="${topico.mensaje}"></span></p>
+    <p><strong>Fecha de creacion:</strong> <span th:text="${topico.fechaCreacion}"></span></p>
+    <p><strong>Status:</strong> <span th:text="${topico.status}"></span></p>
+    <p><strong>Autor:</strong> <span th:text="${topico.autor.nombre}"></span></p>
+    <p><strong>Nombre del curso:</strong> <span th:text="${topico.curso.nombre}"></span></p>
+    <p><strong>Categoria del curso:</strong> <span th:text="${topico.curso.categoria}"></span></p>
+</div>
+
+<button th:if="${topico.autor.correoElectronico == correoElectronico}"
+        onclick="deleteTopic(/*[[${topico.id}]], /*[[${token}]], /*[[${correoElectronico}]]])">
+    Delete
+</button>
+
+<a th:href="@{/topicos(token=${token}, correoElectronico=${correoElectronico})}">Regresar a todos los topicos</a>
+
+</body>
+</html>

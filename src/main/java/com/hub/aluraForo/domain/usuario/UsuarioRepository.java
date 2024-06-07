@@ -11,4 +11,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     UserDetails findByCorreoElectronico(String correo);
 
+    @Query ("SELECT nombre FROM Usuario u WHERE u.correoElectronico = :correo")
+    String findNombreUsuarioByCorreo(String correo);
+
+    Usuario findUsuarioByCorreoElectronico(String correo);
+
 }
