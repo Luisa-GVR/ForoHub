@@ -37,7 +37,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (tokenParameter != null) {
 
             var token = tokenParameter.replace("Bearer ", "");
-            var correoElectronico = tokenService.getSubject(token); // extract username
+            var correoElectronico = tokenService.getSubject(token);
 
             if (correoElectronico != null) {
                 // Token valido
