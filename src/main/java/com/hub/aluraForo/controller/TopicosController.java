@@ -3,6 +3,8 @@ package com.hub.aluraForo.controller;
 import com.hub.aluraForo.domain.categoria.Categoria;
 import com.hub.aluraForo.domain.curso.Curso;
 import com.hub.aluraForo.domain.curso.CursoRepository;
+import com.hub.aluraForo.domain.respuesta.Respuesta;
+import com.hub.aluraForo.domain.respuesta.RespuestaRepository;
 import com.hub.aluraForo.domain.topico.Topico;
 import com.hub.aluraForo.domain.topico.TopicoRepository;
 import com.hub.aluraForo.domain.usuario.Usuario;
@@ -41,6 +43,9 @@ public class TopicosController {
     private TopicoRepository topicoRepository;
     @Autowired
     private CursoRepository cursoRepository;
+    @Autowired
+    private RespuestaRepository respuestaRepository;
+
 
     private String correoElectronicoGlobal;
 
@@ -142,19 +147,24 @@ public class TopicosController {
     //Obtener un topico especifico
     @GetMapping("/{id}")
     public ModelAndView detalleTopico(@PathVariable Long id,
-                                      @RequestParam(name = "token", required = true) String token
+                                      @RequestParam(name = "token", required = true) String token) {
 
-    ) {
         Optional<Topico> topicoOptional = topicoRepository.findById(id);
 
         if (topicoOptional.isPresent()) {
+            //Obtener topico
             Topico topico = topicoOptional.get();
+
+            // Obtener las respuestas del tópico
+            List<Respuesta> respuestas = respuestaRepository.findByTopico(topico);
+
+
 
             // agregar topico al modelview
             ModelAndView modelAndView = new ModelAndView("topicoID");
             modelAndView.addObject("topico", topico);
             modelAndView.addObject("token", token);
-
+            modelAndView.addObject("respuestas", respuestas);
             modelAndView.addObject("correoElectronico", correoElectronicoGlobal);
 
             return modelAndView;
@@ -163,6 +173,63 @@ public class TopicosController {
             return new ModelAndView("redirect:/topicos?token=" + token + "&correoElectronico=" + correoElectronicoGlobal);
         }
     }
+
+    //Agregar comentario
+    @PostMapping("topicos/{id}/respuestas")
+    public String agregarRespuesta(@PathVariable Long id,
+                                   @RequestParam(name = "token", required = true) String token,
+                                   @RequestParam(name = "mensaje", required = true) String mensaje) {
+
+        logger.info("almenos entre a respuestas");
+
+        Optional<Topico> topicoOptional = topicoRepository.findById(id);
+
+
+        if (topicoOptional.isPresent()) {
+            Topico topico = topicoOptional.get();
+
+            logger.info("topico presente");
+
+
+            if ("active".equalsIgnoreCase(topico.getStatus())) {
+
+                logger.info("topico activo");
+
+                Usuario autor = usuarioRepository.findUsuarioByCorreoElectronico(correoElectronicoGlobal);
+                if (autor != null) {
+                    Respuesta respuesta = new Respuesta();
+                    respuesta.setMensaje(mensaje);
+                    respuesta.setFechaCreacion(LocalDateTime.now());
+                    respuesta.setTopico(topico);
+                    respuesta.setAutor(autor);
+                    respuesta.setSolucion(false);
+
+                    respuestaRepository.save(respuesta);
+
+                    return "redirect:/topicos/" + id + "?token=" + token + "&correoElectronico=" + correoElectronicoGlobal;
+                } else {
+                    logger.info("no autor");
+
+                    //No se encuentra autor
+                }
+            } else {
+                logger.info("no activo");
+
+                //No activo
+
+            }
+        } else {
+            logger.info("no topico");
+
+            //No hay topico
+        }
+        logger.info(correoElectronicoGlobal);
+
+        return "redirect:/topicos/" + id + "?token=" + token + "&correoElectronico=" + correoElectronicoGlobal;
+
+
+    }
+
 
     //Borrar un topico especifico
     @DeleteMapping("/{id}")

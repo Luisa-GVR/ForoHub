@@ -39,16 +39,15 @@
         }
     </style>
 
-
     <script th:inline="javascript">
-    function showModal(modalId) {
-        document.getElementById(modalId).style.display = "block";
-    }
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
 
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = "none";
-    }
-</script>
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+    </script>
 </head>
 <body>
 <h1>Detalles del topico</h1>
@@ -73,19 +72,18 @@
     Editar
 </button>
 
-
 <a th:href="@{/topicos(token=${token}, correoElectronico=${correoElectronico})}">Regresar a todos los topicos</a>
 
 <div id="deleteModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
+        <span class="close" onclick="closeModal('deleteModal')">&times;</span>
         <p>Estas seguro que deseas eliminar el topico?</p>
         <form th:action="@{/topicos/{id}(id=${topico.id})}" method="post">
             <input type="hidden" name="_method" value="delete"/>
             <input type="hidden" name="token" th:value="${token}"/>
             <input type="hidden" name="correoElectronico" th:value="${correoElectronico}"/>
             <button type="submit">Si</button>
-            <button type="button" onclick="closeModal()">No</button>
+            <button type="button" onclick="closeModal('deleteModal')">No</button>
         </form>
     </div>
 </div>
@@ -114,6 +112,43 @@
         </form>
     </div>
 </div>
+
+<!-- Formulario para añadir respuestas -->
+<div th:if="${topico.status == 'active'}"> <!-- visible solo si el topico está activo -->
+    <h2>Añadir una respuesta</h2>
+    <form th:action="@{'topicos/' + ${topico.id} + '/respuestas?token=' + ${token} + '&correoElectronico=' + ${correoElectronico}}" method="post">
+        <input type="hidden" name="topicoId" th:value="${topico.id}"/>
+        <input type="hidden" name="autorCorreo" th:value="${correoElectronico}"/>
+        <label for="mensajeRespuesta">Mensaje:</label>
+        <textarea id="mensajeRespuesta" name="mensaje" required></textarea>
+        <button type="submit">Enviar</button>
+    </form>
+</div>
+
+<!-- Sección para mostrar las respuestas -->
+<div>
+    <h2>Comentarios</h2>
+    <table border="1" style="width:100%; border-collapse: collapse;">
+        <thead>
+        <tr>
+            <th>Autor</th>
+            <th>Mensaje</th>
+            <th>Fecha de creación</th>
+            <th>Solucion</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="respuesta : ${respuestas}">
+            <td th:text="${respuesta.autor.nombre}">Nombre del autor</td>
+            <td th:text="${respuesta.mensaje}">Mensaje de la respuesta</td>
+            <td th:text="${respuesta.fechaCreacion}">Fecha de creación</td>
+            <td th:text="${respuesta.isSolucion}">Solucion</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
 
 </body>
 </html>
