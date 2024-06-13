@@ -14,16 +14,16 @@
     <input type="hidden" name="correoElectronico" th:value="${correoElectronico}"/>
 
     <label for="titulo">Título:</label>
-    <input type="text" id="titulo" name="titulo"/><br/>
+    <input type="text" id="titulo" name="titulo" required/><br/>
 
     <label for="mensaje">Mensaje:</label>
-    <textarea id="mensaje" name="mensaje"></textarea><br/>
+    <textarea id="mensaje" name="mensaje" required></textarea><br/>
 
     <label for="nombreCurso">Nombre del Curso:</label>
-    <input type="text" id="nombreCurso" name="nombreCurso"/><br/>
+    <input type="text" id="nombreCurso" name="nombreCurso" required/><br/>
 
     <label for="categoria">Categoría:</label>
-    <select id="categoria" name="categoria">
+    <select id="categoria" name="categoria" required>
         <option value="PROGRAMACION">PROGRAMACION</option>
         <option value="FRONT_END">FRONT_END</option>
         <option value="DATA_SCIENCE">DATA_SCIENCE</option>

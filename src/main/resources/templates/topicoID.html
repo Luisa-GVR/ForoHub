@@ -135,7 +135,7 @@
             <th>Mensaje</th>
             <th>Fecha de creación</th>
             <th>Solucion</th>
-
+            <th th:if="${topico.status == 'active' and topico.autor.correoElectronico == correoElectronico}">Marcar como solución</th>
         </tr>
         </thead>
         <tbody>
@@ -144,10 +144,42 @@
             <td th:text="${respuesta.mensaje}">Mensaje de la respuesta</td>
             <td th:text="${respuesta.fechaCreacion}">Fecha de creación</td>
             <td th:text="${respuesta.isSolucion}">Solucion</td>
+            <td th:if="${topico.status == 'active' and topico.autor.correoElectronico == correoElectronico}">
+                <button type="button" th:onclick="'marcarComoSolucion(' + ${respuesta.id} + ')'">Marcar como solución</button>
+            </td>
         </tr>
         </tbody>
     </table>
 </div>
+
+<script th:inline="javascript">
+    function marcarComoSolucion(respuestaId) {
+        var topicoId = /*[[${topico.id}]]*/;
+        var token = /*[[${token}]]*/;
+        var correoElectronico = /*[[${correoElectronico}]]*/;
+
+        var url = '/topicos/' + topicoId + '/respuestas/' + respuestaId + '/solucion?token=' + token + '&correoElectronico=' + correoElectronico;
+
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Respuesta marcada como solución');
+                location.reload(); // Recargar la página para ver los cambios
+            } else {
+                response.text().then(text => alert('Error al marcar la respuesta como solución: ' + text));
+            }
+        }).catch(error => {
+            console.error('Error en la solicitud fetch: ', error);
+        });
+    }
+</script>
+
+
 
 
 </body>

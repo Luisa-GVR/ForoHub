@@ -13,6 +13,8 @@ import com.hub.aluraForo.infra.security.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -180,7 +182,6 @@ public class TopicosController {
                                    @RequestParam(name = "token", required = true) String token,
                                    @RequestParam(name = "mensaje", required = true) String mensaje) {
 
-        logger.info("almenos entre a respuestas");
 
         Optional<Topico> topicoOptional = topicoRepository.findById(id);
 
@@ -188,12 +189,10 @@ public class TopicosController {
         if (topicoOptional.isPresent()) {
             Topico topico = topicoOptional.get();
 
-            logger.info("topico presente");
 
 
             if ("active".equalsIgnoreCase(topico.getStatus())) {
 
-                logger.info("topico activo");
 
                 Usuario autor = usuarioRepository.findUsuarioByCorreoElectronico(correoElectronicoGlobal);
                 if (autor != null) {
@@ -230,7 +229,42 @@ public class TopicosController {
 
     }
 
+    @PostMapping("/{topicoId}/respuestas/{respuestaId}/solucion")
+    @ResponseBody
+    public ResponseEntity<String> marcarComoSolucion(@PathVariable Long topicoId,
+                                                     @PathVariable Long respuestaId,
+                                                     @RequestParam String token,
+                                                     @RequestParam String correoElectronico) {
 
+
+        Optional<Topico> topicoOptional = topicoRepository.findById(topicoId);
+        if (topicoOptional.isPresent()) {
+            Topico topico = topicoOptional.get();
+
+
+
+            if ("active".equalsIgnoreCase(topico.getStatus())) {
+                Optional<Respuesta> respuestaOptional = respuestaRepository.findById(respuestaId);
+                if (respuestaOptional.isPresent()) {
+
+                    Respuesta respuesta = respuestaOptional.get();
+                    respuesta.setSolucion(true);
+                    respuestaRepository.save(respuesta);
+
+                    topico.setStatus("inactive");
+                    topicoRepository.save(topico);
+
+                    return ResponseEntity.ok("Respuesta marcada como solución");
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Respuesta no encontrada");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("El tópico no está activo");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tópico no encontrado");
+        }
+    }
     //Borrar un topico especifico
     @DeleteMapping("/{id}")
     public ModelAndView eliminarTopico(@PathVariable Long id,
@@ -296,7 +330,5 @@ public class TopicosController {
                     .addObject("error", "Topico no encontrado");
         }
     }
-
-
 
 }
